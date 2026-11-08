@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>حسابي</title>
+<style>
+:root{--bg:#f3f6fa;--paper:#fff;--line:#dbe4ef;--ink:#16243a;--mu:#6a7a90;--red:#c0271d;--grn:#1b7a46}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1622;--paper:#18212f;--line:#2a374b;--ink:#e8eef7;--mu:#93a3ba;--red:#ff7b70;--grn:#58d08c}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Tahoma,"Segoe UI",sans-serif;line-height:1.5}
+.app{max-width:520px;margin:0 auto;padding:18px 16px 40px}
+.card{background:var(--paper);border-radius:14px;padding:18px;box-shadow:0 1px 0 var(--line);margin-bottom:14px}
+.big{font-size:38px;font-weight:800;color:var(--red);border-bottom:3px solid var(--red);display:inline-block}.big.ok{color:var(--grn);border-color:var(--grn)}
+.mu{color:var(--mu);font-size:14px}.tx{display:flex;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}.tx:last-child{border:0}
+.list{background:var(--paper);border-radius:14px;overflow:hidden}.d{color:var(--red);font-weight:700}.p{color:var(--grn);font-weight:700}
+button{font:inherit;padding:10px 16px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+</style></head><body><div class="app" id="app">جارٍ التحميل...</div>
+<script>
+var CFG={url:'https://awnufrfcctcndojttvcg.supabase.co',key:'sb_publishable_Ghldd_fgkGlYhm-3OI9Pkg_nuq7GRcF'};
+var tok=decodeURIComponent(location.hash.slice(1));
+function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
+function n(x){return Math.abs(x).toLocaleString('en-US')+' دج'}
+function msg(t){document.getElementById('app').innerHTML='<div class="card">'+t+'</div>'}
+function show(d){
+  var b=d.bal;
+  document.getElementById('app').innerHTML=
+  '<div class="card"><div class="mu">'+esc(d.shop||'حسابك عند التاجر')+'</div><b style="font-size:20px">'+esc(d.name)+'</b><br><span class="big'+(b<=0?' ok':'')+'">'+n(b)+'</span><div class="mu">'+(b>0?'المبلغ المستحق عليك':b<0?'رصيد زائد لك':'لا شيء عليك')+'</div></div>'+
+  '<div class="list">'+(d.tx.length?d.tx.map(function(t){return'<div class="tx"><div><b>'+(t.k==='d'?'أخذت بضاعة':'دفعت')+'</b><div class="mu">'+new Date(t.ts).toLocaleDateString('fr-FR')+(t.n?' · '+esc(t.n):'')+'</div></div><div class="'+(t.k==='d'?'d':'p')+'">'+(t.k==='d'?'+':'−')+t.a.toLocaleString('en-US')+'</div></div>'}).join(''):'<div class="tx mu">لا توجد عمليات.</div>')+'</div>'+
+  '<p class="mu" style="text-align:center">آخر تحديث: '+new Date(d.updated_at).toLocaleString('fr-FR')+'<br>هذه الصفحة للاطلاع فقط.</p><p style="text-align:center"><button onclick="load()">تحديث</button></p>';
+}
+function load(){
+  if(!tok)return msg('الرابط غير صحيح.');
+  fetch(CFG.url+'/rest/v1/rpc/get_share',{method:'POST',headers:{apikey:CFG.key,'Content-Type':'application/json'},body:JSON.stringify({p_token:tok})})
+  .then(function(r){if(!r.ok)throw 0;return r.json()})
+  .then(function(d){d&&d.name?show(d):msg('هذا الرابط غير صالح أو أُلغي. اطلب من التاجر رابطاً جديداً.')})
+  .catch(function(){msg('تعذّر تحميل الحساب. تحقق من الإنترنت ثم أعد المحاولة.')});
+}
+document.addEventListener('visibilitychange',function(){if(!document.hidden)load()});
+load();
+</script></body></html>
